@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://myvm.site:3306?leadnews_user
+    username: root
+    password: admin

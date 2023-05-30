@@ -1,0 +1,16 @@
+#全局端口定义server:
+
+spring:
+  aop:
+    proxy-target-class: true
+
+# 全局字符集设置
+server:
+  tomcat:
+    uri-encoding: utf-8
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
+
