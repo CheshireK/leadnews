@@ -114,6 +114,9 @@ public class AppJwtUtil {
         Claims claims = jws.getBody();
         System.out.println(claims.get("id"));
 
+        // Claims claimsBody = getClaimsBody("eyJhbGciOiJIUzUxMiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAAADWM0QqDMAxF_yXPFprMavRvUk2xglBIhY2xf1_2sLd7OJz7hrNXWKEgseQ5BtVtC-ODSpA0LiEyc9lnWfLEMECVDitOnBImYhrA7uy1vazr9fNmjofWS5zk3p2kNd_6bP_SL72s7hAjfb7njMD-gwAAAA.mKHvdvfC0cPaL93c9Dfm-9T9XDVB6QxJQ_sNHTIHucKe-XZiZxz_6RW2pLrX6m4QI64_Q_W1VmXFmCrOEu7hLQ");
+
+
     }
 
 }

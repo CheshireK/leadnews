@@ -1,0 +1,6 @@
+minio:
+  accessKey: MLRkJboqht26bwHYKgjI
+  secretKey: qfujHrMRPBQtUZorFG3sS8HUfXDQBAtBhIAxFJTj
+  bucket: leadnews
+  endpoint: http://myvm.site:9000
+  readPath: http://myvm.site:9000

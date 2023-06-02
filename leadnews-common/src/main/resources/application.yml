@@ -14,3 +14,10 @@ server:
       force: true
       enabled: true
 
+
+aliyun:
+  accessKeyId: LTAI5tCWHCcfvqQzu8k2oKmX
+  secret: auoKUFsghimbfVQHpy7gtRyBkoR4vc
+  #aliyun.scenes=porn,terrorism,ad,qrcode,live,logo
+  scenes: terrorism
+

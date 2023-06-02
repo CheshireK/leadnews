@@ -23,6 +23,9 @@
         <module>leadnews-gateway</module>
         <module>leadnews-service</module>
         <module>leadnews-test</module>
+        <module>leadnews-file-starter</module>
+        <module>leadnews-gateway/leadnews-wemedia-gateway</module>
+        <module>leadnews-service/leadnews-wemedia</module>
     </modules>
 
     <properties>
@@ -71,10 +74,10 @@
 
     <dependencies>
         <!--日志处理包-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>org.springframework.boot</groupId>-->
+        <!--    <artifactId>spring-boot-starter-log4j2</artifactId>-->
+        <!--</dependency>-->
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -88,6 +91,7 @@
     <dependencyManagement>
         <dependencies>
             <!--内部依赖工程-->
+
             <dependency>
                 <artifactId>leadnews-feign-api</artifactId>
                 <groupId>com.myapp</groupId>

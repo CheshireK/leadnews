@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>leadnews-app-gateway</module>
+        <module>leadnews-wemedia-gateway</module>
     </modules>
 
     <properties>
@@ -59,6 +60,10 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
     </dependencies>
 </project>

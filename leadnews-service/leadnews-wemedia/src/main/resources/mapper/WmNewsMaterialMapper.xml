@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myapp.wemedia.mapper.WmNewsMaterialMapper">
+    <!--void saveRelations(@Param("materialIds") List<Integer> materialIds,
+                            @Param("newsId") Integer newsId, @Param("type")Short type);-->
+    <insert id="saveRelations">
+        insert into wm_news_material (material_id, news_id, type, ord)
+        values
+        <foreach collection="materialIds" separator="," item="mid" index="ord">
+            (#{mid}, #{newsId}, #{type}, #{ord})
+        </foreach>
+    </insert>
+</mapper>
