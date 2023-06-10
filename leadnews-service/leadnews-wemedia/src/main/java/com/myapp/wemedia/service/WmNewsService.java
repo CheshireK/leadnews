@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.wemedia.dto.WmNewsDto;
 import com.myapp.model.wemedia.dto.WmNewsPageReqDto;
+import com.myapp.model.wemedia.dto.WmNewsStatusDto;
 import com.myapp.model.wemedia.pojo.WmNews;
 
 public interface WmNewsService extends IService<WmNews> {
@@ -19,4 +20,7 @@ public interface WmNewsService extends IService<WmNews> {
 
 
     ResponseResult removeWmNewsById(Long newsId);
+
+
+    ResponseResult downOrUpWmNews(WmNewsStatusDto dto);
 }

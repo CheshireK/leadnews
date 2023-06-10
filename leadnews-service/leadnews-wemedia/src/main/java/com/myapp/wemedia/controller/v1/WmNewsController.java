@@ -3,6 +3,7 @@ package com.myapp.wemedia.controller.v1;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.wemedia.dto.WmNewsDto;
 import com.myapp.model.wemedia.dto.WmNewsPageReqDto;
+import com.myapp.model.wemedia.dto.WmNewsStatusDto;
 import com.myapp.wemedia.service.WmNewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +31,10 @@ public class WmNewsController {
     @GetMapping("/del_news/{newsId}")
     public ResponseResult delNewsById(@PathVariable Long newsId){
         return newsService.removeWmNewsById(newsId);
+    }
+
+    @PostMapping("/down_or_up")
+    public ResponseResult downOrUpWmNews(@RequestBody WmNewsStatusDto dto){
+        return newsService.downOrUpWmNews(dto);
     }
 }

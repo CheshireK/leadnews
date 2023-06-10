@@ -2,15 +2,19 @@ package com.myapp.wemedia.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myapp.common.exception.CustomException;
+import com.myapp.model.article.dto.ArticleStatusDto;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
+import com.myapp.model.common.constant.WmNewsMessageConstants;
 import com.myapp.model.common.dto.PageResponseResult;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.wemedia.dto.WmNewsDto;
 import com.myapp.model.wemedia.dto.WmNewsPageReqDto;
+import com.myapp.model.wemedia.dto.WmNewsStatusDto;
 import com.myapp.model.wemedia.pojo.WmMaterial;
 import com.myapp.model.wemedia.pojo.WmNews;
 import com.myapp.model.wemedia.pojo.WmNewsMaterial;
@@ -21,9 +25,11 @@ import com.myapp.wemedia.mapper.WmNewsMapper;
 import com.myapp.wemedia.mapper.WmNewsMaterialMapper;
 import com.myapp.wemedia.service.WmAutoCensorService;
 import com.myapp.wemedia.service.WmNewsService;
+import com.myapp.wemedia.service.WmNewsTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -48,6 +54,9 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
     @Autowired
     private WmAutoCensorService autoCensorService;
+
+    @Autowired
+    private WmNewsTaskService newsTaskService;
 
     @Override
     public ResponseResult listAll(WmNewsPageReqDto dto) {
@@ -117,7 +126,8 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
                     @Override
                     public void afterCommit() {
                         // 审核文章
-                        autoCensorService.autoCensorWmNews(news.getId());
+                        // autoCensorService.autoCensorWmNews(news.getId());
+                        newsTaskService.addWmNewsToTask(news.getId(), news.getPublishTime());
                     }
                 }
         );
@@ -130,40 +140,88 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
     @Override
     @Transactional
     public ResponseResult removeWmNewsById(Long newsId) {
-        if (newsId == null){
+        if (newsId == null) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "文章id不能为空");
         }
         WmNews wmNews = baseMapper.selectById(newsId);
 
-        if (wmNews == null){
+        if (wmNews == null) {
             return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST, "文章不存在");
         }
         // 删除自媒体文章
         // 删除文章与图片的关系
         newsMaterialMapper.delete(new LambdaQueryWrapper<WmNewsMaterial>().eq(WmNewsMaterial::getNewsId, newsId));
         // 文章已发布，不能删除
-        Long articleId = wmNews.getArticleId();
-        if (articleId != null){
+        Short enable = wmNews.getEnable();
+        if (enable != null && enable.equals(WM_NEWS_ENABLE)) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "文章已发布，不能删除");
+        }
+        // 删除app文章
+        Long articleId = wmNews.getArticleId();
+        if (articleId != null) {
+            // TODO 删除app文章
+            ArticleStatusDto articleStatusDto = new ArticleStatusDto();
+            articleStatusDto.setId(articleId);
+            kafkaTemplate.send(WmNewsMessageConstants.WM_NEWS_DELETE_TOPIC, JSON.toJSONString(articleStatusDto));
         }
         baseMapper.deleteById(newsId);
         log.info("删除文章成功, id={}", newsId);
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Override
+    @Transactional
+    public ResponseResult downOrUpWmNews(WmNewsStatusDto dto) {
+        Integer newsId = dto.getId();
+        Short enable = dto.getEnable();
+        if (newsId == null || enable == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        WmNews wmNews = baseMapper.selectById(newsId);
+        if (wmNews == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST, "文章不存在");
+        }
+        if (!wmNews.getStatus().equals(WM_STATUS_PUBLISHED)) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "文章不在发布状态，无法上架或下架");
+        }
+        // 修改自媒体文章上架状态
+        if (enable == 1 || enable == 0) {
+            LambdaUpdateWrapper<WmNews> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.set(WmNews::getEnable, enable)
+                    .eq(WmNews::getId, newsId);
+            baseMapper.update(wmNews, updateWrapper);
+        }
+
+        // 修改app文章上架状态
+        // 使用kafka消息队列，异步通知app下架文章
+        if (wmNews.getArticleId() != null){
+            ArticleStatusDto statusDto = new ArticleStatusDto();
+            statusDto.setId(wmNews.getArticleId());
+            statusDto.setEnable(dto.getEnable());
+            kafkaTemplate.send(WmNewsMessageConstants.WM_NEWS_UP_OR_DOWN_TOPIC, JSON.toJSONString(statusDto));
+            log.debug("向kafka发送消息，topic={},message={}",WmNewsMessageConstants.WM_NEWS_UP_OR_DOWN_TOPIC, statusDto);
+        }
+
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
     /**
      * 保存自媒体文章
+     *
      * @param news
      */
-    private void saveOrUpdateWmNews(WmNews news){
+    private void saveOrUpdateWmNews(WmNews news) {
         WmUser user = WmThreadLocalUtil.getUser();
         news.setUserId(user.getId());
         news.setCreatedTime(new Date());
         news.setSubmitedTime(new Date());
-        news.setEnable(WM_NEWS_ENABLE);
-        if (news.getId() == null){
+        news.setEnable(WM_NEWS_DISABLE);
+        if (news.getId() == null) {
             this.save(news);
-        }else {
+        } else {
             newsMaterialMapper.delete(new LambdaQueryWrapper<WmNewsMaterial>()
                     .eq(WmNewsMaterial::getNewsId, news.getId()));
             this.updateById(news);
@@ -173,6 +231,7 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
     /**
      * 提取内容中的图片地址
+     *
      * @param dto
      * @return
      */
@@ -191,18 +250,20 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
     /**
      * 处理正文图片，并保存文章和图片的关系
+     *
      * @param news
      * @param imageUrls
      */
     private void handleContentImages(WmNews news, List<String> imageUrls) {
-        if (imageUrls!=null && imageUrls.size()>0){
+        if (imageUrls != null && imageUrls.size() > 0) {
             saveRelationOfNewsAndMaterials(news, imageUrls, WM_CONTENT_REFERENCE);
         }
-        log.debug("处理正文图片，并保存文章和图片的关系,正文id={},imageUrls={}",news.getId(), imageUrls);
+        log.debug("处理正文图片，并保存文章和图片的关系,正文id={},imageUrls={}", news.getId(), imageUrls);
     }
 
     /**
      * 处理封面图片，并保存封面和图片的关系
+     *
      * @param dto
      * @param news
      * @param imageUrls
@@ -225,27 +286,28 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
             // 无图
             else news.setType(WM_NEWS_NONE_IMAGE);
 
-            if (images != null && images.size() > 0){
+            if (images != null && images.size() > 0) {
                 news.setImages(StringUtils.collectionToDelimitedString(images, ","));
             }
             updateById(news);
         }
-        if (images!=null && images.size()>0){
+        if (images != null && images.size() > 0) {
             saveRelationOfNewsAndMaterials(news, images, WM_COVER_REFERENCE);
         }
-        log.debug("处理封面图片，并保存封面和图片的关系,正文id={},imageUrls={}",news.getId(), imageUrls);
+        log.debug("处理封面图片，并保存封面和图片的关系,正文id={},imageUrls={}", news.getId(), imageUrls);
     }
 
     /**
      * 保存的图片和文章的关系
-     * @param news 自媒体文章
+     *
+     * @param news      自媒体文章
      * @param imageUrls 正文中提取的image url列表
-     * @param type 图片素材 与文章的关系（封面，内容图片）
+     * @param type      图片素材 与文章的关系（封面，内容图片）
      */
     private void saveRelationOfNewsAndMaterials(WmNews news, List<String> imageUrls, Short type) {
         // 根据url list查询素材库，获取素材id list
         LambdaQueryWrapper<WmMaterial> wrapper = new LambdaQueryWrapper<>();
-        wrapper.in(imageUrls!=null, WmMaterial::getUrl, imageUrls);
+        wrapper.in(imageUrls != null, WmMaterial::getUrl, imageUrls);
         List<WmMaterial> materialList = materialMapper.selectList(wrapper);
         // 素材查询出现问题，抛出异常，回滚状态
         if (materialList == null || materialList.isEmpty() || materialList.size() != imageUrls.size()) {
@@ -257,15 +319,4 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         newsMaterialMapper.saveRelations(idList, news.getId(), type);
     }
 
-    public static void main(String[] args) {
-        // List<String> list = new ArrayList<>();
-        // Collections.addAll(list, "a","b","c");
-        // String delimitedString = StringUtils.collectionToDelimitedString(list, "-");
-        // System.out.println("delimitedString = " + delimitedString);
-        // long s1 = 1L;
-        // int s2 = 1;
-        // System.out.println("Objects.equals(s1,s2) = " + Objects.equals(s1, s2));
-        // System.out.println("s1 == s2 = " + (s1 == s2));
-
-    }
 }

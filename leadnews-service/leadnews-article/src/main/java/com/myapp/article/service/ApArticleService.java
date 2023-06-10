@@ -21,4 +21,8 @@ public interface ApArticleService  extends IService<ApArticle> {
      * @return
      */
     ResponseResult saveOrUpdateArticle(ArticleDto dto);
+
+    ResponseResult upOrDownArticle(Long articleId);
+
+    ResponseResult deleteArticle(Long articleId);
 }

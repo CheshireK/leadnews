@@ -14,6 +14,9 @@ import reactor.core.publisher.Mono;
 import static com.myapp.model.common.constant.CustomHeader.HEADER_TOKEN;
 import static com.myapp.model.common.constant.CustomHeader.HEADER_USER_ID;
 
+/**
+ * 获取Header中的token解析用户信息，将用户放入头信息中
+ */
 @Slf4j
 @Component
 public class HeaderProcessFilter implements GlobalFilter, Ordered {

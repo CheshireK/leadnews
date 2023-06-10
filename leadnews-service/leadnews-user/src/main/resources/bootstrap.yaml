@@ -1,6 +1,8 @@
 server:
   port: 51801
 spring:
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
   application:
     name: leadnews-user
   cloud:
@@ -12,3 +14,11 @@ spring:
         server-addr: myvm.site:8848
         namespace: leadnews
         file-extension: yaml
+
+
+management:
+  health:
+    redis:
+      enabled: false
+    mongo:
+      enabled: false

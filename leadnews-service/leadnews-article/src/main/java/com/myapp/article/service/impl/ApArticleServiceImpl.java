@@ -1,13 +1,13 @@
 package com.myapp.article.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myapp.article.mapper.ApArticleConfigMapper;
 import com.myapp.article.mapper.ApArticleContentMapper;
 import com.myapp.article.mapper.ApArticleMapper;
+import com.myapp.article.service.ApArticleFreemarkerService;
 import com.myapp.article.service.ApArticleService;
-import com.myapp.common.exception.CustomException;
-import com.myapp.file.service.FileStorageService;
 import com.myapp.model.article.dto.ArticleDto;
 import com.myapp.model.article.dto.ArticleHomeDto;
 import com.myapp.model.article.pojo.ApArticle;
@@ -15,7 +15,6 @@ import com.myapp.model.article.pojo.ApArticleConfig;
 import com.myapp.model.article.pojo.ApArticleContent;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
 import com.myapp.model.common.dto.ResponseResult;
-import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +44,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     private ApArticleConfigMapper articleConfigMapper;
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
-    private Configuration configuration;
+    private ApArticleFreemarkerService freemarkerService;
 
     /**
      * 根据参数加载文章列表
@@ -111,12 +107,12 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 baseMapper.insert(article);
 
                 // 保存配置
-                ApArticleConfig articleConfig = new ApArticleConfig(articleId);
+                ApArticleConfig articleConfig = new ApArticleConfig(article.getId());
                 articleConfigMapper.insert(articleConfig);
 
                 // 保存 文章内容
                 ApArticleContent content = new ApArticleContent();
-                content.setArticleId(articleId);
+                content.setArticleId(article.getId());
                 content.setContent(dto.getContent());
                 articleContentMapper.insert(content);
             }
@@ -127,7 +123,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
                 // 修改文章内容
                 ApArticleContent content = articleContentMapper.selectOne(new LambdaQueryWrapper<ApArticleContent>()
-                        .eq(ApArticleContent::getArticleId, article.getId()));
+                        .eq(ApArticleContent::getArticleId, articleId));
                 if (update == 0 || content == null) {
                     return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID,
                             "文章没有找到");
@@ -138,7 +134,32 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         } catch (Exception e) {
             return ResponseResult.errorResult(AppHttpCodeEnum.SERVER_ERROR);
         }
+
+        // 调用异步接口，保存静态html文件
+        freemarkerService.buildApArticleToMinio(article, dto.getContent());
+
         // 3.结果返回  文章的id
         return ResponseResult.okResult(article.getId());
+    }
+
+    @Override
+    public ResponseResult upOrDownArticle(Long articleId) {
+        //TODO 上架下架app文章
+        return null;
+    }
+
+    @Override
+    public ResponseResult deleteArticle(Long articleId) {
+        if (articleId == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        ApArticleConfig config = new ApArticleConfig();
+        config.setArticleId(articleId);
+        config.setIsDelete(true);
+        LambdaUpdateWrapper<ApArticleConfig> updateWrapper
+                = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(ApArticleConfig::getArticleId, articleId);
+        articleConfigMapper.update(config, updateWrapper);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 }

@@ -1,0 +1,21 @@
+server:
+  port: 51901
+spring:
+  application:
+    name: leadnews-search
+  cloud:
+    nacos:
+      discovery:
+        server-addr: myvm.site:8848
+        namespace: leadnews
+      config:
+        server-addr: myvm.site:8848
+        file-extension: yaml
+        namespace: leadnews
+
+management:
+  health:
+    redis:
+      enabled: false
+    mongo:
+      enabled: false

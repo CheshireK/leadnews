@@ -12,3 +12,10 @@ spring:
         server-addr: myvm.site:8848
         namespace: leadnews
         file-extension: yaml
+
+management:
+  health:
+    redis:
+      enabled: false
+    mongo:
+      enabled: false

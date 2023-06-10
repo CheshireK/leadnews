@@ -1,0 +1,16 @@
+server:
+  port: 8881
+
+spring:
+  cloud:
+    inetutils:
+      preferred-networks: 192.168.123\.(.*)
+      default-ip-address: 192.168.123.33
+
+xxl:
+  job:
+    admin:
+      addresses: http://myvm.site:8888/xxl-job-admin
+    executor:
+      appname: test-executor
+      port: 9991

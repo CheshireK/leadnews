@@ -21,3 +21,7 @@ aliyun:
   #aliyun.scenes=porn,terrorism,ad,qrcode,live,logo
   scenes: terrorism
 
+tess4j:
+  dataPath: D:\Data\tessdata
+  language: chi_sim
+
