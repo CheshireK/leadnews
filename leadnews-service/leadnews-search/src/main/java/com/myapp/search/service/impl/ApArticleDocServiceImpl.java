@@ -1,7 +1,7 @@
 package com.myapp.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.myapp.model.common.constant.ArticleIndexConstant;
+import com.myapp.model.article.ArticleIndexConstant;
 import com.myapp.model.search.vo.SearchArticleVo;
 import com.myapp.search.service.ApArticleDocService;
 import lombok.extern.slf4j.Slf4j;

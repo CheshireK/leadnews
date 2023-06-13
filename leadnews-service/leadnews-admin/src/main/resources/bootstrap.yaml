@@ -1,0 +1,30 @@
+server:
+  port: 51900
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration, org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration
+  #  autoconfigure:
+  #    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+  application:
+    name: leadnews-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: myvm.site:8848
+        namespace: leadnews
+      config:
+        server-addr: myvm.site:8848
+        namespace: leadnews
+        file-extension: yaml
+
+management:
+  health:
+    redis:
+      enabled: false
+    mongo:
+      enabled: false
+
+logging:
+  level:
+    root: info
+    com.myapp: debug

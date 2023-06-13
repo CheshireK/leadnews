@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.myapp.model.common.constant.ArticleConstant.LOADTYPE_LOAD_MORE;
-import static com.myapp.model.common.constant.ArticleConstant.LOADTYPE_LOAD_NEW;
+import static com.myapp.model.article.ArticleConstant.LOADTYPE_LOAD_MORE;
+import static com.myapp.model.article.ArticleConstant.LOADTYPE_LOAD_NEW;
 
 @RestController
 @Slf4j

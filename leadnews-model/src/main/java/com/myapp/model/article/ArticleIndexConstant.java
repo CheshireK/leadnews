@@ -1,4 +1,4 @@
-package com.myapp.model.common.constant;
+package com.myapp.model.article;
 
 /**
  * Article Elasticsearch 相关常量

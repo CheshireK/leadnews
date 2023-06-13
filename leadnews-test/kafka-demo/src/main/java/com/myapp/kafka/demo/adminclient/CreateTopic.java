@@ -19,8 +19,10 @@ public class CreateTopic {
         // 创建topic集合，将NewTopic对象添加到这个集合
         Collection<NewTopic> newTopics = new ArrayList<>();
         // 参数：name，分区数量，副本数量（不能超过集群的服务器数量）
-        NewTopic topic = new NewTopic("my-topic", 3, (short) 1);
-        newTopics.add(topic);
+        NewTopic topic1 = new NewTopic("topic-input", 1, (short) 1);
+        NewTopic topic2 = new NewTopic("topic-output", 1, (short) 1);
+        newTopics.add(topic1);
+        newTopics.add(topic2);
         // 创建集合中所有的topic
         CreateTopicsResult topics = adminClient.createTopics(newTopics);
         try {

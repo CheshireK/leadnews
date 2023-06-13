@@ -2,7 +2,7 @@ package com.myapp.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
-import com.myapp.model.common.constant.ArticleIndexConstant;
+import com.myapp.model.article.ArticleIndexConstant;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.search.dto.UserSearchDto;
 import com.myapp.model.search.vo.SearchArticleVo;

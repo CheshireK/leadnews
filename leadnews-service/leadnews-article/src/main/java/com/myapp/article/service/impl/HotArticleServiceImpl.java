@@ -8,7 +8,7 @@ import com.myapp.common.redis.CacheService;
 import com.myapp.model.article.bo.HotArticleBo;
 import com.myapp.model.article.pojo.ApArticle;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
-import com.myapp.model.common.constant.ArticleConstant;
+import com.myapp.model.article.ArticleConstant;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.wemedia.pojo.WmChannel;
 import lombok.extern.slf4j.Slf4j;

@@ -6,15 +6,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myapp.article.mapper.ApArticleConfigMapper;
 import com.myapp.article.mapper.ApArticleContentMapper;
 import com.myapp.article.mapper.ApArticleMapper;
+import com.myapp.article.mapper.ApCollectionMapper;
 import com.myapp.article.service.ApArticleFreemarkerService;
 import com.myapp.article.service.ApArticleService;
+import com.myapp.model.article.dto.ApCollection;
 import com.myapp.model.article.dto.ArticleDto;
 import com.myapp.model.article.dto.ArticleHomeDto;
 import com.myapp.model.article.pojo.ApArticle;
 import com.myapp.model.article.pojo.ApArticleConfig;
 import com.myapp.model.article.pojo.ApArticleContent;
+import com.myapp.model.behavior.constant.BehaviorConstant;
+import com.myapp.model.behavior.dto.CollectionBehaviorDto;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
 import com.myapp.model.common.dto.ResponseResult;
+import com.myapp.model.user.pojo.ApUser;
+import com.myapp.util.thread.ApThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.myapp.model.common.constant.ArticleConstant.*;
+import static com.myapp.model.article.ArticleConstant.*;
 
 @Service
 @Slf4j
@@ -160,6 +166,57 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 = new LambdaUpdateWrapper<>();
         updateWrapper.eq(ApArticleConfig::getArticleId, articleId);
         articleConfigMapper.update(config, updateWrapper);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+
+    @Autowired
+    private ApCollectionMapper apCollectionMapper;
+    /**
+     * 收藏文章
+     *
+     * @param dto 收藏行为
+     * @return 成功响应
+     */
+    @Override
+    public ResponseResult collectArticle(CollectionBehaviorDto dto) {
+        if (dto==null || dto.getEntryId()==null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "EntryId参数错误");
+        }
+        if (dto.getOperation()==null || dto.getOperation() < 0 || dto.getOperation() > 1){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "Operation参数错误");
+        }
+        if (dto.getType()==null || dto.getType() < 0 || dto.getType() > 1){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "Type参数错误");
+        }
+        if (dto.getPublishedTime() == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID, "PublishedTime参数错误");
+        }
+        ApUser user = ApThreadLocalUtil.getUser();
+        if (user==null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEED_LOGIN);
+        }
+        Long articleId = dto.getEntryId();
+        Integer userId = user.getId();
+        // 收藏
+        ApArticle apArticle = articleMapper.selectById(articleId);
+        if (dto.getOperation().equals(BehaviorConstant.OPERATION_COLLECT)){
+            ApCollection apCollection = new ApCollection();
+            apCollection.setEntryId(userId);
+            apCollection.setArticleId(articleId);
+            apCollection.setCollectionTime(new Date());
+            apCollection.setPublishedTime(dto.getPublishedTime());
+            apCollection.setType(BehaviorConstant.TYPE_ARTICLE);
+            apCollectionMapper.insert(apCollection);
+            log.info("收藏操作, userId={}, articleId={}", userId, articleId);
+        }
+        // 取消收藏
+        else {
+            apCollectionMapper.delete(new LambdaUpdateWrapper<ApCollection>()
+                    .eq(ApCollection::getEntryId,userId)
+                    .eq(ApCollection::getArticleId, articleId));
+            log.info("取消收藏, userId={}, articleId={}", userId, articleId);
+        }
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 }

@@ -7,7 +7,7 @@ import com.myapp.article.mapper.ApArticleMapper;
 import com.myapp.article.service.ApArticleFreemarkerService;
 import com.myapp.file.service.FileStorageService;
 import com.myapp.model.article.pojo.ApArticle;
-import com.myapp.model.common.constant.ArticleMessageConstant;
+import com.myapp.model.article.ArticleMessageConstant;
 import com.myapp.model.search.vo.SearchArticleVo;
 import freemarker.template.Configuration;
 import freemarker.template.Template;

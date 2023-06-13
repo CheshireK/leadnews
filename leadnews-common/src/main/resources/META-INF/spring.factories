@@ -4,4 +4,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.myapp.common.aliyun.GreenImageScan, \
   com.myapp.common.aliyun.GreenTextScan,\
   com.myapp.common.tess4j.Tess4jClient, \
-  com.myapp.common.redis.CacheService
+  com.myapp.common.redis.CacheService, \
+  com.myapp.common.json.InitJacksonConfig

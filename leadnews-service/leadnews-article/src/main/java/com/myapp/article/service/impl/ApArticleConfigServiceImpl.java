@@ -6,7 +6,7 @@ import com.myapp.article.mapper.ApArticleConfigMapper;
 import com.myapp.article.service.ApArticleConfigService;
 import com.myapp.model.article.dto.ArticleStatusDto;
 import com.myapp.model.article.pojo.ApArticleConfig;
-import com.myapp.model.common.constant.WemediaConstants;
+import com.myapp.model.wemedia.constatnt.WemediaConstants;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myapp.common.exception.CustomException;
 import com.myapp.model.article.dto.ArticleStatusDto;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
-import com.myapp.model.common.constant.WmNewsMessageConstants;
+import com.myapp.model.wemedia.constatnt.WmNewsMessageConstants;
 import com.myapp.model.common.dto.PageResponseResult;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.wemedia.dto.WmNewsDto;
@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.myapp.model.common.constant.WemediaConstants.*;
+import static com.myapp.model.wemedia.constatnt.WemediaConstants.*;
 
 @Service
 @Slf4j

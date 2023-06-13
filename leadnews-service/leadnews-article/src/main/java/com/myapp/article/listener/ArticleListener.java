@@ -3,7 +3,7 @@ package com.myapp.article.listener;
 import com.alibaba.fastjson.JSON;
 import com.myapp.article.service.ApArticleConfigService;
 import com.myapp.model.article.dto.ArticleStatusDto;
-import com.myapp.model.common.constant.WmNewsMessageConstants;
+import com.myapp.model.wemedia.constatnt.WmNewsMessageConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;

@@ -1,0 +1,14 @@
+server:
+  port: 6001
+spring:
+  application:
+    name: leadnews-admin-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: myvm.site:8848
+        namespace: leadnews
+      config:
+        server-addr: myvm.site:8848
+        namespace: leadnews
+        file-extension: yaml

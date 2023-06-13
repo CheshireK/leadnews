@@ -3,7 +3,7 @@ package com.myapp.wemedia.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.myapp.api.schedule.IScheduleClient;
 import com.myapp.model.common.constant.AppHttpCodeEnum;
-import com.myapp.model.common.constant.TaskTypeEnum;
+import com.myapp.model.schedule.TaskTypeEnum;
 import com.myapp.model.common.dto.ResponseResult;
 import com.myapp.model.schedule.dto.Task;
 import com.myapp.model.wemedia.pojo.WmNews;

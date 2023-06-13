@@ -1,4 +1,4 @@
-package com.myapp.model.common.constant;
+package com.myapp.model.schedule;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

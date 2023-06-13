@@ -1,4 +1,4 @@
-package com.myapp.model.common.constant;
+package com.myapp.model.article;
 
 public class ArticleConstant {
     /**

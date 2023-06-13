@@ -16,6 +16,8 @@
         <module>leadnews-article</module>
         <module>leadnews-wemedia</module>
         <module>leadnews-search</module>
+        <module>leadnews-behavior</module>
+        <module>leadnews-admin</module>
     </modules>
 
     <properties>

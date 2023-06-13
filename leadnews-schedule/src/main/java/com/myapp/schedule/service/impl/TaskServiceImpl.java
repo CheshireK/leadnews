@@ -3,7 +3,7 @@ package com.myapp.schedule.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.myapp.common.redis.CacheService;
-import com.myapp.model.common.constant.ScheduleConstant;
+import com.myapp.model.schedule.ScheduleConstant;
 import com.myapp.model.schedule.dto.Task;
 import com.myapp.model.schedule.pojo.Taskinfo;
 import com.myapp.model.schedule.pojo.TaskinfoLogs;

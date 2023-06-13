@@ -1,6 +1,6 @@
 package com.myapp.search.listener;
 
-import com.myapp.model.common.constant.ArticleMessageConstant;
+import com.myapp.model.article.ArticleMessageConstant;
 import com.myapp.search.service.ApArticleDocService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

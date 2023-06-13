@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static com.myapp.model.common.constant.WemediaConstants.*;
+import static com.myapp.model.wemedia.constatnt.WemediaConstants.*;
 
 @Service
 @Slf4j

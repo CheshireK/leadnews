@@ -2,7 +2,7 @@ package com.myapp.model.article.bo;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.myapp.model.article.pojo.ApArticle;
-import com.myapp.model.common.constant.ArticleConstant;
+import com.myapp.model.article.ArticleConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
